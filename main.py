@@ -3,10 +3,13 @@ from core import FTPU
 
 def main():
     ftp = FTPU()
+    prompt = '[{}@{} {}]$ '
     if not ftp.ftp:
         quit()
     while 1:
-        c = input(ftp.ftp.pwd())
+        c = input(prompt.format(ftp.uname,ftp.service,ftp.path))
+        if not c:
+            continue
         c = c.split(' ')
         cm = c.pop(0)
         if cm in ftp.commands:

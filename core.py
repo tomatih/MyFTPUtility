@@ -26,6 +26,9 @@ class FTPU:
 
     def __init__(self):
         self.ftp = None
+        self.path = 'ERROR'
+        self.uname = 'ERROR'
+        self.service = 'ERROR'
         self.commands = {func: getattr(self, func) for func in dir(self) if
                          callable(getattr(self, func)) and not func.startswith("__") and not func.startswith('_')}
         self._startup()
@@ -36,11 +39,13 @@ class FTPU:
         url = input("Enter the server url/ip: ")
         try:
             ftp = ftplib.FTP(url)
+            self.service = url
         except socket.gaierror:
             print("Couldn't find given server")
             return
         username = input("Enter username(blank for anonymous): ")
         if username:
+            self.uname = username
             password = getpass(prompt="Enter password: ")
             try:
                 print(ftp.login(username, password))
@@ -54,6 +59,7 @@ class FTPU:
         else:
             try:
                 print(ftp.login())
+                self.uname = 'Anonymus'
             except ftplib.error_perm:
                 print("Server doesn't allow anonymous logging")
                 return
@@ -63,6 +69,7 @@ class FTPU:
                 return
 
         print(ftp.getwelcome())
+        self.path = ftp.pwd()
         self.ftp = ftp
 
     def q(self):
@@ -83,6 +90,7 @@ class FTPU:
         """Change current directory
         usage: cd {directory}"""
         self.ftp.cwd(path)
+        self.path = self.ftp.pwd()
 
     @safe_exec
     def rm(self, file):
